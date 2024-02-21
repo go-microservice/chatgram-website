@@ -3,15 +3,45 @@
 // components/layout/Header.tsx
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn, signOut, useSession } from "next-auth/react";
+import { auth } from "@/services/auth";
 
 const Header: React.FC = () => {
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   const [curPath, setCurPath] = useState('');
 
   useEffect(() => {
     setCurPath(router.pathname);
   }, [router.pathname]);
+
+  if (status === "loading") {
+    return <p>Loading...</p>
+  }
+
+  if (status === "unauthenticated") {
+    return <p>Access Denied</p>
+  }
+
+  // if (session && session.user) {
+  //   console.log("session.user", session?.user);
+  //   return (
+  //     <button
+  //       onClick={() => signOut()}
+  //     >
+  //       {session.user.name} Sign Out
+  //     </button>
+  //   );
+  // }
+
+  // return (
+  //   <button
+  //     onClick={() => signIn()}
+  //   >
+  //     SignIn
+  //   </button>
+  // );
 
   return (
     <div className='hg-header fixed z-10 h-14 w-full bg-white shadow-sm backdrop-blur dark:border dark:border-gray-50/[0.06] dark:bg-transparent'>
@@ -46,6 +76,9 @@ const Header: React.FC = () => {
           <button className='inline-flex items-center rounded px-2 py-2 focus:outline-none focus-visible:ring focus-visible:ring-primary-500 transition-colors duration-75 shadow-none active:bg-primary-100 disabled:bg-primary-100 disabled:cursor-not-allowed font-normal text-current hover:bg-transparent dark:text-gray-400 dark:hover:bg-gray-700'>文章</button>
           </li>
         </ul>
+        <div>
+          <h1>Welcome, {session?.user.name ?? "guest"}!</h1>
+        </div>
         <div className='shrink grow'></div>
       </nav>
     </div>
